@@ -22,8 +22,10 @@ OUTPUT_FORMAT(binary)
 /* The ROM address depends on the target */
 #if defined(MACHINE_AMIGA)
 # define ROM_ORIGIN 0x00fc0000
+/* rt68f has no ROM
 #elif defined(MACHINE_RT68F)
-# define ROM_ORIGIN 0x00300000
+# define ROM_ORIGIN 0x00040000
+*/
 #elif defined(TARGET_CART)
 # define ROM_ORIGIN 0x00fa0000
 #elif defined(TARGET_192)

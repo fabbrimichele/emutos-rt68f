@@ -641,6 +641,8 @@ TOCLEAN += *.img
 
 IMG_RT68F = emutos-rt68f.img
 RT68F_DEFS =
+# EmuTOS code starts at 0x800
+START_ADDRESS := 00000800 
 
 .PHONY: rt68f
 NODEP += rt68f
@@ -654,11 +656,14 @@ rt68f:
 	$(MAKE) CPUFLAGS='$(CPUFLAGS)' DEF='$(DEF)' OPTFLAGS='$(OPTFLAGS)' UNIQUE=$(UNIQUE) IMG_RT68F=$(IMG_RT68F) $(IMG_RT68F) REF_OS=TOS206
 	@printf "$(LOCALCONFINFO)"
 
-# TODO: I need to create the image in the format expected by the rt68f bootloader
-# Image is loaded from serial no padding needed
-#   ./mkrom pad $(ROMSIZE)k $< $(IMG_RT68F)
+# Creates the img file in the format expected by the rt68f bootloader
 $(IMG_RT68F): emutos.img mkrom
-	cp $< $(IMG_RT68F)
+	SHELL_RAW_FILE="emutos.img"; \
+	FILE_SIZE=$$(stat -c %s $$SHELL_RAW_FILE); \
+	HEX_SIZE=$$(printf "%08X" "$$FILE_SIZE"); \
+	HEADER_HEX="$(START_ADDRESS)"$$HEX_SIZE; \
+	echo "$$HEADER_HEX" | xxd -r -p | cat - $$SHELL_RAW_FILE > $(IMG_RT68F)
+# cp $< $(IMG_RT68F)
 
 #
 # Amiga Image

@@ -60,6 +60,7 @@
 #include "nova.h"
 #include "tosvars.h"
 #include "amiga.h"
+#include "rt68f.h"
 #include "lisa.h"
 #include "coldfire.h"
 #if WITH_CLI
@@ -227,6 +228,11 @@ static void bios_init(void)
     KDEBUG(("amiga_uae_init()\n"));
     amiga_uae_init();
 #endif
+#if defined(MACHINE_RT68F)
+    KDEBUG(("rt68f_init()\n"));
+    rt68f_init();
+#endif
+
 
     /* Initialize the processor */
     KDEBUG(("processor_init()\n"));

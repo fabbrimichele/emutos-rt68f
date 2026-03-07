@@ -565,7 +565,7 @@
 /*
  * Defaults for the rt68f IMG target
  */
-#ifdef TARGET_RT68_IMG
+#ifdef TARGET_RT68F_IMG
 # define MACHINE_RT68F
 #endif
 
@@ -576,6 +576,9 @@
 #ifdef MACHINE_RT68F
 # ifndef CONF_ATARI_HARDWARE
 #  define CONF_ATARI_HARDWARE 0
+# endif
+# ifndef EMUTOS_LIVES_IN_RAM
+#  define EMUTOS_LIVES_IN_RAM 1
 # endif
 # ifndef CONF_WITH_FLEXCAN
 #  define CONF_WITH_FLEXCAN 0
