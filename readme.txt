@@ -1,3 +1,6 @@
+Note: This is a specialized fork of EmuTOS for the RT68F FPGA computer. For specific porting notes, see "readme-rt68.md".
+
+
 This release has been built using Vincent Rivière's GCC 4.6.4 cross-compiler.
 
 The source package and other binary packages are available at:
