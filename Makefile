@@ -306,6 +306,7 @@ bios_src +=  memory.S processor.S vectors.S aciavecs.S bios.c xbios.c acsi.c \
              parport.c screen.c serport.c sound.c videl.c vt52.c xhdi.c \
              pmmu030.c 68040_pmmu.S \
              amiga.c amiga2.S spi_vamp.c \
+			 rt68f.c rt68f2.S \
              lisa.c lisa2.S \
              delay.c delayasm.S sd.c memory2.c bootparams.c scsi.c nova.c \
              dsp.c dsp2.S \
@@ -632,6 +633,32 @@ cart:
 	$(MAKE) OPTFLAGS='$(OPTFLAGS)' DEF='$(DEF)' UNIQUE=$(COUNTRY) WITH_AES=$(WITH_AES) ROMSIZE=$(ROMSIZE) ROM_PADDED=$(ROM_PADDED) $(ROM_PADDED) REF_OS=TOS104
 	./mkrom stc emutos.img emutos.stc
 	@printf "$(LOCALCONFINFO)"
+
+#
+# rt68f Image
+#
+TOCLEAN += *.img
+
+IMG_RT68F = emutos-rt68f.img
+RT68F_DEFS =
+
+.PHONY: rt68f
+NODEP += rt68f
+rt68f: UNIQUE = $(COUNTRY)
+rt68f: OPTFLAGS = $(SMALL_OPTFLAGS)
+rt68f: override DEF += -DTARGET_RT68_IMG $(RT68_DEFS)
+rt68f: WITH_AES=0	# Switch graphic UI off
+rt68f: WITH_CLI=1	# Switch console on
+rt68f:
+	@echo "# Building rt68f EmuTOS into $(IMG_RT68F)"
+	$(MAKE) CPUFLAGS='$(CPUFLAGS)' DEF='$(DEF)' OPTFLAGS='$(OPTFLAGS)' UNIQUE=$(UNIQUE) IMG_RT68F=$(IMG_RT68F) $(IMG_RT68F) REF_OS=TOS206
+	@printf "$(LOCALCONFINFO)"
+
+# TODO: I need to create the image in the format expected by the rt68f bootloader
+# Image is loaded from serial no padding needed
+#   ./mkrom pad $(ROMSIZE)k $< $(IMG_RT68F)
+$(IMG_RT68F): emutos.img mkrom
+	cp $< $(IMG_RT68F)
 
 #
 # Amiga Image
