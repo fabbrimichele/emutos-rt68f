@@ -577,9 +577,11 @@
 # ifndef CONF_ATARI_HARDWARE
 #  define CONF_ATARI_HARDWARE 0
 # endif
+/*
 # ifndef EMUTOS_LIVES_IN_RAM
 #  define EMUTOS_LIVES_IN_RAM 1
 # endif
+*/
 # ifndef CONF_WITH_FLEXCAN
 #  define CONF_WITH_FLEXCAN 0
 # endif

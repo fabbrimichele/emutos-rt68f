@@ -35,6 +35,7 @@
 #include "bios.h"
 #include "bdosbind.h"
 #include "amiga.h"
+#include "rt68f.h"
 #include "lisa.h"
 #include "nova.h"
 
@@ -624,6 +625,11 @@ void screen_init_mode(void)
 #ifdef MACHINE_AMIGA
     amiga_screen_init();
 #endif
+
+#ifdef MACHINE_RT68F
+    rt68f_screen_init();
+#endif
+
 
 #ifdef MACHINE_LISA
     lisa_screen_init();

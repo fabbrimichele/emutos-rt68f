@@ -31,6 +31,7 @@
         .extern _stktop
         .extern _meminit_flags
         .extern amiga_memconf
+        .extern rt68f_memconf
 
         // functions for detecting hardware
         .extern _check_read_byte
@@ -141,6 +142,7 @@ memchk:
 #endif // __mcoldfire__
 #endif // !EMUTOS_LIVES_IN_RAM
 
+        // ****** check if the code is executed ******
         // The old RAM settings are valid, load them into registers.
         // They will stay in safe place in case we clear the sysvars.
         move.b  memctrl.w, d6
@@ -183,7 +185,16 @@ memory_reused:
 
 .warm_magic_done:
 #endif
+
+#if defined(MACHINE_RT68F)
+        lea     rt68f_memconf_ret(pc),a6
+        jmp     rt68f_memconf
+rt68f_memconf_ret:
+        // Fall into memconf_done
+#endif
+
         jra     stram_detected
+
 
 #if !EMUTOS_LIVES_IN_RAM
 
