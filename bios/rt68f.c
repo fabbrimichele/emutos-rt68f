@@ -134,7 +134,6 @@ void rt68f_rs232_write_byte(UBYTE b)
     UART_RBR = (UWORD)b;
 }
 
-/* kprintf() for RT68F debug log */
 void kprintf_outc_rt68f_rs232(int c)
 {
     // Raw terminals usually require CRLF 

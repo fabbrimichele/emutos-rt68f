@@ -171,7 +171,7 @@ static int vkprintf(const char *fmt, va_list ap)
     }
 #endif
 
-#if RS232_DEBUG_PRINT
+#if RS232_DEBUG_PRINT && !defined(MACHINE_RT68F)
     if (boot_status&RS232_AVAILABLE) {  /* no RS232, no message */
         int rc;
         char *stacksave = NULL;
