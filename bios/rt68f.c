@@ -24,8 +24,17 @@
 #define VGA_CTRL *(volatile UWORD*)0x430000 // VGA Control
 
 /* Serial registers */
-// TODO
-
+/*
+   TODO: there might be a better way to define 
+         registers based on a start address
+*/
+#define UART_RBR *(volatile UWORD*)(0x410000) // Receive Buffer Register(RBR) / Transmitter Holding Register(THR) / Divisor Latch (LSB)
+#define UART_IER *(volatile UWORD*)(0x410002) // Interrupt enable register / Divisor Latch (MSB)
+#define UART_IIR *(volatile UWORD*)(0x410004) // Interrupt Identification Register
+#define UART_LCR *(volatile UWORD*)(0x410006) // Line control register
+#define UART_MCR *(volatile UWORD*)(0x410008) // MODEM control register
+#define UART_LSR *(volatile UWORD*)(0x41000a) // Line status register
+#define UART_MSR *(volatile UWORD*)(0x41000c) // MODEM status register
 
 /* Screen Mode Bits 1-0) */
 #define MODE_640X400_4COL       0x00  // 0 -> 640x400 4 colors
@@ -33,7 +42,7 @@
 #define MODE_320X200_256CO      0x02  // 2 -> 320x200 256 colors
 #define MODE_640X400_2COL       0x03  // 3 -> 640x400 2 colors
 
-/* Feature Bit Flags */
+/* Screen Feature Bit Flags */
 #define OVERSCAN_ON             (1 << 2) // Bit 2: 0x04
 #define VBLANK_INT_ENABLE       (1 << 3) // Bit 3: 0x08
 #define VBLANK_ACK              (1 << 6) // Bit 6: 0x40
@@ -106,6 +115,32 @@ const UBYTE *rt68f_physbase(void)
 void rt68f_rs232_init(void) {
     // Serial is already configured by the bootloader
     LED = 0x3; // Debug
+}
+
+BOOL rt68f_rs232_can_write(void)
+{
+    // Check if space is available in the FIFO
+    return UART_LSR & 0x20; // Bit 5 - TODO: use a constant
+}
+
+void rt68f_rs232_write_byte(UBYTE b)
+{
+    while (!rt68f_rs232_can_write())
+    {
+        // Wait
+    }
+    // Send the byte
+    UART_RBR = 0x0000 | b;
+}
+
+/* kprintf() for RT68F debug log */
+void kprintf_outc_rt68f_rs232(int c)
+{
+    // Raw terminals usually require CRLF 
+    if ( c == '\n')
+        rt68f_rs232_write_byte('\r');
+
+    rt68f_rs232_write_byte((char)c);
 }
 
 #endif /* MACHINE_RT68F */

@@ -577,11 +577,6 @@
 # ifndef CONF_ATARI_HARDWARE
 #  define CONF_ATARI_HARDWARE 0
 # endif
-/*
-# ifndef EMUTOS_LIVES_IN_RAM
-#  define EMUTOS_LIVES_IN_RAM 1
-# endif
-*/
 # ifndef CONF_WITH_FLEXCAN
 #  define CONF_WITH_FLEXCAN 0
 # endif
@@ -597,8 +592,28 @@
 # ifndef CONF_VRAM_ADDRESS
 #  define CONF_VRAM_ADDRESS 0x00200000                            
 # endif
+/* TODO: define a real VBL (vertical blank), it is supported by RT68F */
 # ifndef CONF_WITH_FAKE_VBL
 #  define CONF_WITH_FAKE_VBL 1
+# endif
+/*
+# ifndef EMUTOS_LIVES_IN_RAM
+#  define EMUTOS_LIVES_IN_RAM 1
+# endif
+*/
+/* TODO: I'm not sure this correct, it uses Atari ST MFP (MC68901)
+# ifndef RS232_DEBUG_PRINT
+#  define RS232_DEBUG_PRINT 1
+# endif
+*/
+/* TODO: This might not be the correct way to set it, see COLDFIRE_DEBUG_PRINT*/
+/*
+# ifndef RT68F_DEBUG_PRINT
+#  define RT68F_DEBUG_PRINT
+# endif
+*/
+# ifndef ENABLE_KDEBUG
+#  define ENABLE_KDEBUG
 # endif
 #endif
 
