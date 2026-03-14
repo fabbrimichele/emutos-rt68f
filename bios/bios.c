@@ -17,7 +17,7 @@
  * option any later version.  See doc/license.txt for details.
  */
 
-/* #define ENABLE_KDEBUG */
+#define ENABLE_KDEBUG
 
 #include "emutos.h"
 #include "biosext.h"
@@ -60,6 +60,7 @@
 #include "nova.h"
 #include "tosvars.h"
 #include "amiga.h"
+#include "rt68f.h"
 #include "lisa.h"
 #include "coldfire.h"
 #if WITH_CLI
@@ -212,6 +213,7 @@ static void bios_init(void)
 {
     KDEBUG(("bios_init()\n"));
 
+
     /* initialize Native Features, if available
      * do it as soon as possible so that kprintf can make use of them
      */
@@ -227,6 +229,11 @@ static void bios_init(void)
     KDEBUG(("amiga_uae_init()\n"));
     amiga_uae_init();
 #endif
+#if defined(MACHINE_RT68F)
+    KDEBUG(("rt68f_init()\n"));
+    rt68f_init();
+#endif
+
 
     /* Initialize the processor */
     KDEBUG(("processor_init()\n"));

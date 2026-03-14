@@ -399,7 +399,7 @@ valid_st_mmu_config:
 // Note: LisaEm doesn't properly implement movec/pmove illegal instructions,
 // so we just avoid them on MACHINE_LISA.
 
-#if !defined(__mcoldfire__) && !defined(MACHINE_LISA)
+#if !defined(__mcoldfire__) && !defined(MACHINE_LISA) && !defined(MACHINE_RT68F)
         // first, reset the VBR
         // it may have been modified before emutos-ram or soft reset
         move.l  #vbr_ok,16     // must be 68000 if we get illegal instrn error
@@ -465,7 +465,7 @@ nodiag:
 /*
  * disable the instruction/data caches
  */
-#if !defined(__mcoldfire__) && !defined(MACHINE_LISA)
+#if !defined(__mcoldfire__) && !defined(MACHINE_LISA) && !defined(MACHINE_RT68F)
         move.l  #cache_done,0x10   // must be 68000 if we get illegal instrn error
         move.l  #0x00000808,d0     // clear & disable instruction/data caches on
         MOVEC_D0_CACR              //  68020-60 (even though bit usage differs!)
@@ -475,7 +475,7 @@ cache_done:
 /*
  * disable the MMU
  */
-#if !defined(__mcoldfire__) && !defined(MACHINE_LISA)
+#if !defined(__mcoldfire__) && !defined(MACHINE_LISA) && !defined(MACHINE_RT68F)
         move.l  #not_68030,0x2c    // PMOVE is lineF on non-68030 systems
         lea     zero,a0
         PMOVE_A0_TTR0              // first we initialise the TTRs (ACRs on a 68ec030)
@@ -522,7 +522,11 @@ noreset:
 /*
  * memory configuration
  */
-
+        // *** TODO: there is a problem here
+        // ***       for some reason it doesn't jump to meminit
+        // ***       could it be the bootloader that doesn't load
+        // ***       correctly? The memory maps look correct, 
+        // ***       perhaps it's time to implement a checksome.
         .globl  memdone         // return to, if memory config done
         jmp     meminit         // do/test memory config and clear it (needs sp)
 memdone:
@@ -531,7 +535,6 @@ memdone:
  * From now, the stack is allowed, and C code can be used.
  * The BIOS startup goes on in bios.c
  */
-
         jmp     _biosmain
 
 #if CONF_WITH_CARTRIDGE

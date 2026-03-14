@@ -33,6 +33,7 @@
 #include "ikbd.h"
 #include "midi.h"
 #include "amiga.h"
+#include "rt68f.h"
 
 #define DISPLAY_INSTRUCTION_AT_PC   0   /* set to 1 for extra info from dopanic() */
 #define DISPLAY_STACK               0   /* set to 1 for extra info from dopanic() */
@@ -170,7 +171,7 @@ static int vkprintf(const char *fmt, va_list ap)
     }
 #endif
 
-#if RS232_DEBUG_PRINT
+#if RS232_DEBUG_PRINT && !defined(MACHINE_RT68F)
     if (boot_status&RS232_AVAILABLE) {  /* no RS232, no message */
         int rc;
         char *stacksave = NULL;
@@ -228,6 +229,10 @@ static int vkprintf(const char *fmt, va_list ap)
     if (has_uaelib) {
         return doprintf(kprintf_outc_uae, fmt, ap);
     }
+#endif
+
+#ifdef MACHINE_RT68F
+    return doprintf(kprintf_outc_rt68f_rs232, fmt, ap);
 #endif
 
 #if DETECT_NATIVE_FEATURES

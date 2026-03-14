@@ -23,7 +23,8 @@ OUTPUT_FORMAT(binary)
 #if defined(MACHINE_AMIGA)
 # define ROM_ORIGIN 0x00fc0000
 #elif defined(MACHINE_RT68F)
-# define ROM_ORIGIN 0x00300000
+/* For RT68F simulate ROM in RAM, when not using EMUTOS_LIVES_IN_RAM */
+# define ROM_ORIGIN 0x00040000
 #elif defined(TARGET_CART)
 # define ROM_ORIGIN 0x00fa0000
 #elif defined(TARGET_192)
@@ -45,7 +46,8 @@ OUTPUT_FORMAT(binary)
  */
 MEMORY
 {
-    stram : ORIGIN = 0x00000000, LENGTH = 14M
+    /*stram : ORIGIN = 0x00000000, LENGTH = 14M*/
+    stram : ORIGIN = 0x00000000, LENGTH = 256K
 #if !EMUTOS_LIVES_IN_RAM
     rom : ORIGIN = ROM_ORIGIN, LENGTH = ROM_LENGTH
 #endif
