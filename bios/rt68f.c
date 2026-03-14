@@ -21,8 +21,6 @@
 
 /* Video registers */
 #define VGA_PLTE (void *)0x420000 // VGA Palette
-UWORD* pword_vga_palette = (UWORD *)VGA_PLTE;
-
 #define VGA_CTRL *(volatile UWORD*)0x430000 // VGA Control
 
 /* Serial registers */
@@ -46,21 +44,19 @@ UWORD* pword_vga_palette = (UWORD *)VGA_PLTE;
 */
 void rt68f_init(void) 
 {
-    // TODO: enable Rs232 for kprint?
-    LED = 0x3;   // Switch all LEDs on
+    LED = 0x1;   // Debug
 }
 
-// TODO: initializa serial
+/******************************************************************************/
+/* Screen                                                                     */
+/******************************************************************************/
+
+UWORD* pword_vga_palette = (UWORD *)VGA_PLTE;
+const UBYTE *rt68f_screenbase;
 
 /* 
-* Initialize graphic palette and video mode 
-*  // Control register
-  // Bits 1-0 [Screen mode] : 0 -> 640x400 2 colors, 1 -> 640x200 4 colors, 2 -> 320x200 16 colors, 3 -> 640x400 2 colors
-  // Bit 2    [Overscan]    : 0 -> off, 1 -> on
-  // Bit 3    [VBlank int]  : 0 -> off, 1 -> on
-  // Bit 6    [VBlank ack]  : Write to acknowledge VBlank interrupt
-
-*/
+ * Initialize graphic palette and video mode 
+ */
 void rt68f_screen_init(void)
 {
     VGA_CTRL = MODE_640X400_2COL | OVERSCAN_ON;
@@ -68,6 +64,48 @@ void rt68f_screen_init(void)
     // Set palette colors:
     pword_vga_palette[0] = 0x0FFF; // color 0 xRGB (white)
     pword_vga_palette[1] = 0x0000; // color 1 xRGB (black)
+    
+    LED = 0x2; // Debug
+}
+
+ULONG rt68f_vram_size(void)
+{
+    return 64000UL;
+}
+
+/*
+ * returns the palette (number of colour choices) for the current hardware
+ */
+WORD rt68f_get_palette(void)
+{
+    return 2;
+}
+
+void rt68f_get_current_mode_info(UWORD *planes, UWORD *hz_rez, UWORD *vt_rez)
+{
+    *planes = 1;
+    *hz_rez = 640;
+    *vt_rez = 400;
+}
+
+void rt68f_setphys(const UBYTE *addr)
+{
+    rt68f_screenbase = addr;
+}
+
+const UBYTE *rt68f_physbase(void)
+{
+    return rt68f_screenbase;
+}
+
+
+/******************************************************************************/
+/* RS232                                                                     */
+/******************************************************************************/
+
+void rt68f_rs232_init(void) {
+    // Serial is already configured by the bootloader
+    LED = 0x3; // Debug
 }
 
 #endif /* MACHINE_RT68F */

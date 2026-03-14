@@ -630,7 +630,6 @@ void screen_init_mode(void)
     rt68f_screen_init();
 #endif
 
-
 #ifdef MACHINE_LISA
     lisa_screen_init();
 #endif
@@ -751,6 +750,8 @@ static ULONG calc_vram_size(void)
 {
 #ifdef MACHINE_AMIGA
     return amiga_initial_vram_size();
+#elif defined(MACHINE_RT68F)
+    return rt68f_vram_size();
 #elif defined(MACHINE_LISA)
     return 32*1024UL;
 #else
@@ -820,6 +821,8 @@ void screen_get_current_mode_info(UWORD *planes, UWORD *hz_rez, UWORD *vt_rez)
 
 #ifdef MACHINE_AMIGA
     amiga_get_current_mode_info(planes, hz_rez, vt_rez);
+#elif defined(MACHINE_RT68F)
+    rt68f_get_current_mode_info(planes, hz_rez, vt_rez);
 #elif defined(MACHINE_LISA)
     *planes = 1;
     *hz_rez = 720;
@@ -838,6 +841,8 @@ WORD get_palette(void)
 {
 #ifdef MACHINE_AMIGA
     return 2;               /* we currently only support monochrome */
+#elif defined(MACHINE_RT68F)
+    return rt68f_get_palette();
 #else
     WORD palette;
 
@@ -900,7 +905,7 @@ static __inline__ void get_std_pixel_size(WORD *width,WORD *height)
  */
 void get_pixel_size(WORD *width,WORD *height)
 {
-#ifdef MACHINE_AMIGA
+#if defined(MACHINE_AMIGA) || defined(MACHINE_RT68F)
     get_std_pixel_size(width,height);
 #else
     if (HAS_VIDEL || HAS_TT_SHIFTER)
@@ -1049,6 +1054,8 @@ const UBYTE *physbase(void)
 {
 #ifdef MACHINE_AMIGA
     return amiga_physbase();
+#elif defined(MACHINE_RT68F)
+    return rt68f_physbase();
 #elif defined(MACHINE_LISA)
     return lisa_physbase();
 #elif CONF_WITH_ATARI_VIDEO
@@ -1067,6 +1074,8 @@ static void setphys(const UBYTE *addr)
 
 #ifdef MACHINE_AMIGA
     amiga_setphys(addr);
+#elif defined(MACHINE_RT68F)
+    rt68f_setphys(addr);
 #elif defined(MACHINE_LISA)
     lisa_setphys(addr);
 #elif CONF_WITH_ATARI_VIDEO

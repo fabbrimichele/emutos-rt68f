@@ -212,7 +212,6 @@ extern PFVOID vbl_list[8]; /* Default array for vblqueue */
 static void bios_init(void)
 {
     KDEBUG(("bios_init()\n"));
-    *(volatile unsigned short *)0x004A0000L = 0x2;
 
 
     /* initialize Native Features, if available
@@ -786,7 +785,6 @@ void biosmain(void)
     BOOL show_initinfo;         /* TRUE if welcome screen must be displayed */
     ULONG shiftbits;
 
-    *(volatile unsigned short *)0x004A0000L = 0x1;
     bios_init();                /* Initialize the BIOS */
 
     /* Steem needs this to initialize its GEMDOS hard disk emulation.
