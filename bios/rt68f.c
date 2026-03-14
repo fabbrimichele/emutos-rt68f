@@ -129,8 +129,9 @@ void rt68f_rs232_write_byte(UBYTE b)
     {
         // Wait
     }
+    
     // Send the byte
-    UART_RBR = 0x0000 | b;
+    UART_RBR = (UWORD)b;
 }
 
 /* kprintf() for RT68F debug log */
