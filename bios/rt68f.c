@@ -73,8 +73,6 @@ void rt68f_screen_init(void)
     // Set palette colors:
     pword_vga_palette[0] = 0x0FFF; // color 0 xRGB (white)
     pword_vga_palette[1] = 0x0000; // color 1 xRGB (black)
-    
-    LED = 0x2; // Debug
 }
 
 ULONG rt68f_vram_size(void)
@@ -114,7 +112,6 @@ const UBYTE *rt68f_physbase(void)
 
 void rt68f_rs232_init(void) {
     // Serial is already configured by the bootloader
-    LED = 0x3; // Debug
 }
 
 BOOL rt68f_rs232_can_write(void)

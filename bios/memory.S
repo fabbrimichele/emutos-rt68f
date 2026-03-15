@@ -185,14 +185,6 @@ memory_reused:
 
 .warm_magic_done:
 #endif
-
-#if defined(MACHINE_RT68F)
-        lea     rt68f_memconf_ret(pc),a6
-        jmp     rt68f_memconf
-rt68f_memconf_ret:
-        // Fall into memconf_done
-#endif
-
         jra     stram_detected
 
 
