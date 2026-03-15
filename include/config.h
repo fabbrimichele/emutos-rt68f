@@ -595,10 +595,11 @@
 # ifndef CONF_STRAM_SIZE
 #  define CONF_STRAM_SIZE 256*1024
 # endif
-/* TODO: define a real VBL (vertical blank), it is supported by RT68F */
+/*
 # ifndef CONF_WITH_FAKE_VBL
 #  define CONF_WITH_FAKE_VBL 1
 # endif
+*/
 /*
 # ifndef EMUTOS_LIVES_IN_RAM
 #  define EMUTOS_LIVES_IN_RAM 1
