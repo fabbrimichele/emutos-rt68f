@@ -69,16 +69,15 @@ const UBYTE *rt68f_screenbase;
  */
 void rt68f_screen_init(void)
 {
-    VGA_CTRL = MODE_640X400_2COL | OVERSCAN_ON;
-
     // Set palette colors:
     pword_vga_palette[0] = 0x0FFF; // color 0 xRGB (white)
     pword_vga_palette[1] = 0x0000; // color 1 xRGB (black)
 
+    // TODO: all interrupts are causing issuers, 
+    //       enable again this one once the timer int is fixed.
     /* Set VBL interrupt routine */
-    VEC_LEVEL3 = rt68f_vbl;
-
-    VGA_CTRL = MODE_640X400_2COL | OVERSCAN_ON | VBLANK_INT_ENABLE;
+    //VEC_LEVEL3 = rt68f_vbl;
+    VGA_CTRL = MODE_640X400_2COL; // | VBLANK_INT_ENABLE;
 }
 
 ULONG rt68f_vram_size(void)

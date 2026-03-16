@@ -596,11 +596,6 @@
 #  define CONF_STRAM_SIZE 256*1024
 # endif
 /*
-# ifndef CONF_WITH_FAKE_VBL
-#  define CONF_WITH_FAKE_VBL 1
-# endif
-*/
-/*
 # ifndef EMUTOS_LIVES_IN_RAM
 #  define EMUTOS_LIVES_IN_RAM 1
 # endif
