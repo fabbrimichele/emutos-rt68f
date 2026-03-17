@@ -23,16 +23,22 @@ _rt68f_init_keyboard_interrupt:
 
         // Interrupt handler
 rt68f_int_timer:
-        move.w  #0x2700,sr              // Forbid higher level interrupts
-        jbsr    call_vector_5ms
+        // Clear the hardware interrupt IMMEDIATELY
+        // This prevents the timer from re-triggering while we are in the handler
         or.w    #0x0040,tmra_ctrl       // Acknowledge interrupt
-        rte
+        move.w  #0x2700,sr              // Forbid higher level interrupts
+        movem.l d0-d1/a0-a1,-(sp)
+        jbsr    _rt68f_int_1_c           // Delegate to C implementation
+        movem.l (sp)+,d0-d1/a0-a1
+        rte           
 
-        // Call vector_5ms. The return address is already on the stack.
-        // As it will return with RTE, we must setup a proper stack frame
+// Call vector_5ms (200 Hz system timer callback) from C.
+// As it will return with RTE, we must setup a proper stack frame.
+        .globl  _rt68f_call_5ms
+_rt68f_call_5ms:
+        // The return address is already on the stack.
         // Assume that the CPU is always a 68000 and _longframe is false
-call_vector_5ms:
-        move.w  sr,-(sp)                // Push SR                
+        move.w  sr,-(sp)                // Push SR
         .extern _vector_5ms
         move.l  _vector_5ms,a0
         jmp     (a0)                    // Call the 200 Hz system callback           
@@ -43,8 +49,10 @@ call_vector_5ms:
 /******************************************************************************/
         .globl  _rt68f_vbl
 _rt68f_vbl:
-        jbsr    _int_vbl                // Call the standard VBL handler
+        // Clear the hardware interrupt IMMEDIATELY
+        // This prevents the timer from re-triggering while we are in the handler
         or.w    #0x0040,vga_ctrl        // Ackownledge interrupt
+        jbsr    _int_vbl                // Call the standard VBL handler
         rte
 
 

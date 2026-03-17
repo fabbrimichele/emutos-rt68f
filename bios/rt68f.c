@@ -76,8 +76,8 @@ void rt68f_screen_init(void)
     // TODO: all interrupts are causing issuers, 
     //       enable again this one once the timer int is fixed.
     /* Set VBL interrupt routine */
-    //VEC_LEVEL3 = rt68f_vbl;
-    VGA_CTRL = MODE_640X400_2COL; // | VBLANK_INT_ENABLE;
+    VEC_LEVEL3 = rt68f_vbl;
+    VGA_CTRL = MODE_640X400_2COL | VBLANK_INT_ENABLE;
 }
 
 ULONG rt68f_vram_size(void)
@@ -151,6 +151,12 @@ void kprintf_outc_rt68f_rs232(int c)
 /******************************************************************************/
 void rt68f_init_system_timer(void)
 {
+}
+
+/* INT2 C handler. Called by assembler rt68f_int_2() */
+void rt68f_int_1_c(void)
+{
+    rt68f_call_5ms();
 }
 
 #endif /* MACHINE_RT68F */
