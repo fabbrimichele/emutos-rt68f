@@ -26,20 +26,11 @@ rt68f_int_timer:
         // Clear the hardware interrupt IMMEDIATELY
         // This prevents the timer from re-triggering while we are in the handler
         or.w    #0x0040,tmra_ctrl       // Acknowledge interrupt
-
-        // ************  BUG ************************************************
-        // It gets stuck in the boot screen, likely the problem is 
-        // is that I'm forbidding the wrong interrupts in the following line:
-        // Could it be a calibration issue? I see a warning in the log
-        // calibrate_delay()
-        // Warning: loopcount_1_msec isn't calibrated.
-        // calibrate_delay loopcount_1_msec=760
-
-
         move.w  #0x2700,sr              // Forbid higher level interrupts
                                         // Original interrupt mask will be restored by RTE
         movem.l d0-d1/a0-a1,-(sp)
-        jbsr    _rt68f_int_1_c           // Delegate to C implementation
+        jbsr    _rt68f_int_timer_c      // Delegate to C implementation
+                                        // If C call is removed the SP needs to be adjusted
         movem.l (sp)+,d0-d1/a0-a1
         rte           
 

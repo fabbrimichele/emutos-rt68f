@@ -16,7 +16,7 @@ void rt68f_rs232_write_byte(UBYTE);
 void kprintf_outc_rt68f_rs232(int);
 void rt68f_init_system_timer(void);
 void rt68f_vbl(void);
-void rt68f_int_1_c(void);
+void rt68f_int_timer_c(void);
 void rt68f_call_5ms(void);
 
 

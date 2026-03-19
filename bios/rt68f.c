@@ -155,7 +155,7 @@ void rt68f_init_system_timer(void)
 }
 
 /* INT2 C handler. Called by assembler rt68f_int_timer() */
-void rt68f_int_1_c(void)
+void rt68f_int_timer_c(void)
 {
     rt68f_call_5ms();
     LED = hz_200;
