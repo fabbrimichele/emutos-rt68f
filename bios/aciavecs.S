@@ -225,6 +225,9 @@ _init_acia_vecs:
 #ifdef MACHINE_AMIGA
         jsr     _amiga_init_keyboard_interrupt
 #endif
+#ifdef MACHINE_RT68F
+        jsr     _rt68f_init_keyboard_interrupt
+#endif
         rts
 
         // FIXME: The iorec stuff should go into the .data segment (if

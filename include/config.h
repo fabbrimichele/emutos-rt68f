@@ -577,6 +577,11 @@
 # ifndef CONF_ATARI_HARDWARE
 #  define CONF_ATARI_HARDWARE 0
 # endif
+/* I couldn't understand why but without the machine can't recover 
+   from stop, even when interrupts are apparently enabled. */
+# ifndef USE_STOP_INSN_TO_FREE_HOST_CPU
+#  define USE_STOP_INSN_TO_FREE_HOST_CPU 0
+# endif
 # ifndef CONF_WITH_FLEXCAN
 #  define CONF_WITH_FLEXCAN 0
 # endif
@@ -594,10 +599,6 @@
 # endif
 # ifndef CONF_STRAM_SIZE
 #  define CONF_STRAM_SIZE 256*1024
-# endif
-/* TODO: define a real VBL (vertical blank), it is supported by RT68F */
-# ifndef CONF_WITH_FAKE_VBL
-#  define CONF_WITH_FAKE_VBL 1
 # endif
 /*
 # ifndef EMUTOS_LIVES_IN_RAM

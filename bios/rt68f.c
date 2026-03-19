@@ -12,6 +12,8 @@
 
 #include "emutos.h"
 #include "rt68f.h"
+#include "vectors.h"
+#include "tosvars.h"
 
 
 #ifdef MACHINE_RT68F
@@ -53,7 +55,7 @@
 */
 void rt68f_init(void) 
 {
-    LED = 0x1;   // Debug
+    LED = 0x0;   // Debug
 }
 
 /******************************************************************************/
@@ -68,11 +70,13 @@ const UBYTE *rt68f_screenbase;
  */
 void rt68f_screen_init(void)
 {
-    VGA_CTRL = MODE_640X400_2COL | OVERSCAN_ON;
-
     // Set palette colors:
     pword_vga_palette[0] = 0x0FFF; // color 0 xRGB (white)
     pword_vga_palette[1] = 0x0000; // color 1 xRGB (black)
+
+    /* Set VBL interrupt routine */
+    VEC_LEVEL3 = rt68f_vbl;
+    VGA_CTRL = MODE_640X400_2COL | VBLANK_INT_ENABLE;
 }
 
 ULONG rt68f_vram_size(void)
@@ -107,7 +111,7 @@ const UBYTE *rt68f_physbase(void)
 
 
 /******************************************************************************/
-/* RS232                                                                     */
+/* RS232                                                                      */
 /******************************************************************************/
 
 void rt68f_rs232_init(void) {
@@ -138,6 +142,21 @@ void kprintf_outc_rt68f_rs232(int c)
         rt68f_rs232_write_byte('\r');
 
     rt68f_rs232_write_byte((char)c);
+}
+
+
+/******************************************************************************/
+/* Timer                                                                      */
+/******************************************************************************/
+void rt68f_init_system_timer(void)
+{
+}
+
+/* INT2 C handler. Called by assembler rt68f_int_timer() */
+void rt68f_int_timer_c(void)
+{
+    rt68f_call_5ms();
+    LED = hz_200;
 }
 
 #endif /* MACHINE_RT68F */
