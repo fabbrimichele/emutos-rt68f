@@ -13,6 +13,7 @@
 #include "emutos.h"
 #include "rt68f.h"
 #include "vectors.h"
+#include "tosvars.h"
 
 
 #ifdef MACHINE_RT68F
@@ -54,7 +55,7 @@
 */
 void rt68f_init(void) 
 {
-    LED = 0x1;   // Debug
+    LED = 0x0;   // Debug
 }
 
 /******************************************************************************/
@@ -153,10 +154,11 @@ void rt68f_init_system_timer(void)
 {
 }
 
-/* INT2 C handler. Called by assembler rt68f_int_2() */
+/* INT2 C handler. Called by assembler rt68f_int_timer() */
 void rt68f_int_1_c(void)
 {
     rt68f_call_5ms();
+    LED = hz_200;
 }
 
 #endif /* MACHINE_RT68F */
