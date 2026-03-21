@@ -1084,7 +1084,7 @@ void kbd_init(void)
 #endif
 
 #ifdef MACHINE_RT68F
-    rt68f_kbd_init();
+    rt68f_kbd_mouse_init();
 #endif
 
 #ifdef MACHINE_LISA

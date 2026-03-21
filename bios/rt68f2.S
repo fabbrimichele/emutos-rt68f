@@ -11,6 +11,8 @@
         // PS/2
         .equ ps2a_ctrl, 0x00470000
         .equ ps2a_data, 0x00470002
+        .equ ps2b_ctrl, 0x00480000
+        .equ ps2b_data, 0x00480002
         
 
 /******************************************************************************/
@@ -58,6 +60,17 @@ _rt68f_kbd_int:
         movem.l d0-d1/a0-a1,-(sp)       // C code does not preserve these registers
         or.w    #0x40,ps2a_ctrl         // Clear the hw interrupt
         jbsr    _rt68f_kbd_int_c        // Delegate to C implementation
+        movem.l (sp)+,d0-d1/a0-a1
+        rte
+
+/******************************************************************************/
+/* Interrupt 6: Mouse                                                         */
+/******************************************************************************/
+        .globl  _rt68f_mouse_int
+_rt68f_mouse_int:
+        movem.l d0-d1/a0-a1,-(sp)       // C code does not preserve these registers
+        or.w    #0x40,ps2b_ctrl         // Clear the hw interrupt
+        jbsr    _rt68f_mouse_int_c      // Delegate to C implementation
         movem.l (sp)+,d0-d1/a0-a1
         rte
 

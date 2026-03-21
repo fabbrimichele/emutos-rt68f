@@ -18,9 +18,11 @@ void rt68f_init_system_timer(void);
 void rt68f_vbl_int(void);
 void rt68f_timer_int_c(void);
 void rt68f_call_5ms(void);
-void rt68f_kbd_init(void);
+void rt68f_kbd_mouse_init(void);
 void rt68f_kbd_int(void);
 void rt68f_kbd_int_c(void);
+void rt68f_mouse_int(void);
+void rt68f_mouse_int_c(void);
 void rt68f_ikbd_writeb(UBYTE b);
 
 

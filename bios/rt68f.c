@@ -14,6 +14,7 @@
 #include "rt68f.h"
 #include "vectors.h"
 #include "tosvars.h"
+#include "rt68f_ps2_idkb.h"
 
 
 #ifdef MACHINE_RT68F
@@ -51,8 +52,18 @@
 #define VBLANK_INT_ENABLE       (1 << 3) // Bit 3: 0x08
 #define VBLANK_ACK              (1 << 6) // Bit 6: 0x40
 
-/* PS/2 Feature Bit Flahs */
+/* PS/2 Feature Bit Flags */
 #define PS2_INT_ENABLE          (1 << 1) // Bit 1: 0x02
+
+/* PS/2 & IDKB constants */
+/*
+#define PS2_ACKNOWLEDGE         0x00fa
+#define PS2_BREAK_MASK          0x8000
+#define PS2_CAPSLOCK            0x1103
+#define PS2_CAPSLOCK_BREAK      0x8103
+*/
+#define IDKB_BREAK              0x80
+#define IDKB_CAPSLOCK           0x3a
 
 
 /* Initialize Native Features
@@ -168,25 +179,45 @@ void rt68f_timer_int_c(void)
 /* IKBD                                                                       */
 /* Documentation: https://www.kernel.org/doc/Documentation/input/atarikbd.txt */
 /******************************************************************************/
-void rt68f_kbd_init(void)
+void rt68f_kbd_mouse_init(void)
 {
-    KDEBUG(("rt68f_ikbd_init\n"));
+    KDEBUG(("rt68f_kbd_mouse_init\n"));
 
     // Reset keyboard
-    PS2A_DATA = 0xFF;
+    PS2A_DATA = 0xff;
 
-    // Set interrupt handler
+    // Enable mouse stream
+    PS2B_DATA = 0xf4;
+
+    // Set interrupt handlers
     VEC_LEVEL5 = rt68f_kbd_int;
+    VEC_LEVEL6 = rt68f_mouse_int;
 
-    // Enable PS/2 A interrupt
+    // Enable PS/2 interrupts
     PS2A_CTRL = PS2_INT_ENABLE;
+    PS2B_CTRL = PS2_INT_ENABLE;
 }
 
 void rt68f_kbd_int_c(void)
 {
-    //UBYTE key = PS2A_DATA;
-    //LED = key;
-    LED = PS2A_DATA;
+    UBYTE ps2_code = PS2A_DATA;
+
+    /*
+    UBYTE idkb_code = 0;
+    if (ps2_code != 0xf0) { // 0xf0 ps2 break code, move to constant
+        idkb_code = ps2_idkb_map[ps2_code];
+    }
+
+    if (idkb_code != 0) {
+        idkb_code |= IDKB_BREAK;
+        LED = idkb_code;
+    }
+    */
+}
+
+void rt68f_mouse_int_c(void) {
+    UBYTE ps2_data = PS2B_DATA;
+    LED = ps2_data;
 }
 
 void rt68f_ikbd_writeb(UBYTE b)
