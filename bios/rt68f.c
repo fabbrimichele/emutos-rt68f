@@ -80,7 +80,7 @@ void rt68f_screen_init(void)
     pword_vga_palette[1] = 0x0000; // color 1 xRGB (black)
 
     /* Set VBL interrupt routine */
-    VEC_LEVEL3 = rt68f_vbl;
+    VEC_LEVEL3 = rt68f_vbl_int;
     VGA_CTRL = MODE_640X400_2COL | VBLANK_INT_ENABLE;
 }
 
@@ -157,8 +157,8 @@ void rt68f_init_system_timer(void)
 {
 }
 
-/* INT2 C handler. Called by assembler rt68f_int_timer() */
-void rt68f_int_timer_c(void)
+/* INT2 C handler. Called by assembler rt68f_timer_int() */
+void rt68f_timer_int_c(void)
 {
     rt68f_call_5ms();
     //LED = hz_200;

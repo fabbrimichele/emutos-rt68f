@@ -19,21 +19,21 @@
 // Configure interrupt
         .globl  _rt68f_init_timer_interrupt
 _rt68f_init_timer_interrupt:
-        move.l  #rt68f_int_timer,0x68   // 0x68 is autovector interrupt level 2
+        move.l  #rt68f_timer_int,0x68   // 0x68 is autovector interrupt level 2
         move.w  #79,tmra_prs            // Set prescaler timer A
         move.w  #999,tmra_cnt         // Set counter timer A -> 16MHz / (80 * 1000) = 200Hz
         or.w    #0x0002,tmra_ctrl       // Enable Timer A interrupt (bit 1 high)        
         rts
 
         // Interrupt handler
-rt68f_int_timer:
+rt68f_timer_int:
         // Clear the hardware interrupt IMMEDIATELY
         // This prevents the timer from re-triggering while we are in the handler
         or.w    #0x0040,tmra_ctrl       // Acknowledge interrupt
         move.w  #0x2700,sr              // Forbid higher level interrupts
                                         // Original interrupt mask will be restored by RTE
         movem.l d0-d1/a0-a1,-(sp)
-        jbsr    _rt68f_int_timer_c      // Delegate to C implementation
+        jbsr    _rt68f_timer_int_c      // Delegate to C implementation
                                         // If C call is removed the SP needs to be adjusted
         movem.l (sp)+,d0-d1/a0-a1
         rte           
@@ -64,8 +64,8 @@ _rt68f_kbd_int:
 /******************************************************************************/
 /* Interrupt 5: VBL                                                           */
 /******************************************************************************/
-        .globl  _rt68f_vbl
-_rt68f_vbl:
+        .globl  _rt68f_vbl_int
+_rt68f_vbl_int:
         movem.l d0-d1/a0-a1,-(sp)       // C code does not preserve these registers
         or.w    #0x0040,vga_ctrl        // Clear the hw interrupt
         jbsr    _int_vbl                // Call the standard VBL handler
