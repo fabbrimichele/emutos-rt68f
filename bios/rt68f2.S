@@ -7,14 +7,17 @@
 
         // VGA
         .equ vga_ctrl,  0x00430000      // VGA Control
+
+        // PS/2
+        .equ ps2a_ctrl, 0x00470000
         
 
 /******************************************************************************/
-/* Interrupt 2: Keyboard and 200 Hz timer                                     */
+/* Interrupt 2: 200 Hz timer                                                  */
 /******************************************************************************/
 // Configure interrupt
-        .globl  _rt68f_init_keyboard_interrupt
-_rt68f_init_keyboard_interrupt:
+        .globl  _rt68f_init_timer_interrupt
+_rt68f_init_timer_interrupt:
         move.l  #rt68f_int_timer,0x68   // 0x68 is autovector interrupt level 2
         move.w  #79,tmra_prs            // Set prescaler timer A
         move.w  #999,tmra_cnt         // Set counter timer A -> 16MHz / (80 * 1000) = 200Hz
@@ -47,7 +50,16 @@ _rt68f_call_5ms:
 
 
 /******************************************************************************/
-/* VBL interrupt handler                                                              */
+/* Interrupt 5: Keyboard                                                      */
+/******************************************************************************/
+        .globl  _rt68f_kbd_int
+_rt68f_kbd_int:
+        or.w    #0x40,ps2a_ctrl         // Ackownledge interrupt
+        jsr    _rt68f_kbd_int_c        // Delegate to C implementation
+        rte
+
+/******************************************************************************/
+/* Interrupt 5: VBL                                                           */
 /******************************************************************************/
         .globl  _rt68f_vbl
 _rt68f_vbl:

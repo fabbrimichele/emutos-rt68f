@@ -18,6 +18,10 @@ void rt68f_init_system_timer(void);
 void rt68f_vbl(void);
 void rt68f_int_timer_c(void);
 void rt68f_call_5ms(void);
+void rt68f_kbd_init(void);
+void rt68f_kbd_int(void);
+void rt68f_kbd_int_c(void);
+void rt68f_ikbd_writeb(UBYTE b);
 
 
 #endif /* MACHINE_RT68F */

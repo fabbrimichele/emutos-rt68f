@@ -226,7 +226,7 @@ _init_acia_vecs:
         jsr     _amiga_init_keyboard_interrupt
 #endif
 #ifdef MACHINE_RT68F
-        jsr     _rt68f_init_keyboard_interrupt
+        jsr     _rt68f_init_timer_interrupt
 #endif
         rts
 

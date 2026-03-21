@@ -26,10 +26,6 @@
 #define VGA_CTRL *(volatile UWORD*)0x430000 // VGA Control
 
 /* Serial registers */
-/*
-   TODO: there might be a better way to define 
-         registers based on a start address
-*/
 #define UART_RBR *(volatile UWORD*)(0x410000) // Receive Buffer Register(RBR) / Transmitter Holding Register(THR) / Divisor Latch (LSB)
 #define UART_IER *(volatile UWORD*)(0x410002) // Interrupt enable register / Divisor Latch (MSB)
 #define UART_IIR *(volatile UWORD*)(0x410004) // Interrupt Identification Register
@@ -37,6 +33,12 @@
 #define UART_MCR *(volatile UWORD*)(0x410008) // MODEM control register
 #define UART_LSR *(volatile UWORD*)(0x41000a) // Line status register
 #define UART_MSR *(volatile UWORD*)(0x41000c) // MODEM status register
+
+/* Keyboard & Mouse registers */
+#define PS2A_CTRL *(volatile UWORD*)(0x470000) // Control Register
+#define PS2A_DATA *(volatile UWORD*)(0x470002) // Data Register
+#define PS2B_CTRL *(volatile UWORD*)(0x480000) // Control Register
+#define PS2B_DATA *(volatile UWORD*)(0x480002) // Data Register
 
 /* Screen Mode Bits 1-0) */
 #define MODE_640X400_4COL       0x00  // 0 -> 640x400 4 colors
@@ -48,6 +50,9 @@
 #define OVERSCAN_ON             (1 << 2) // Bit 2: 0x04
 #define VBLANK_INT_ENABLE       (1 << 3) // Bit 3: 0x08
 #define VBLANK_ACK              (1 << 6) // Bit 6: 0x40
+
+/* PS/2 Feature Bit Flahs */
+#define PS2_INT_ENABLE          (1 << 1) // Bit 1: 0x02
 
 
 /* Initialize Native Features
@@ -156,7 +161,60 @@ void rt68f_init_system_timer(void)
 void rt68f_int_timer_c(void)
 {
     rt68f_call_5ms();
-    LED = hz_200;
+    //LED = hz_200;
+}
+
+/******************************************************************************/
+/* IKBD                                                                       */
+/* Documentation: https://www.kernel.org/doc/Documentation/input/atarikbd.txt */
+/******************************************************************************/
+void rt68f_kbd_init(void)
+{
+    KDEBUG(("rt68f_ikbd_init\n"));
+
+    // Reset keyboard
+    PS2A_DATA = 0xFF;
+
+    // Set interrupt handler
+    VEC_LEVEL5 = rt68f_kbd_int;
+
+    // Enable PS/2 A interrupt
+    PS2A_CTRL = PS2_INT_ENABLE;
+}
+
+void rt68f_kbd_int_c(void)
+{
+    UBYTE key = PS2A_DATA;
+    LED = key;
+}
+
+void rt68f_ikbd_writeb(UBYTE b)
+{
+    KDEBUG(("rt68f_ikbd_writeb 0x%02x\n", b));
+
+
+    /* commands sent when EmuTOS start
+    RESET
+    rt68f_ikbd_writeb 0x80 
+    rt68f_ikbd_writeb 0x01    
+
+    SET RELATIVE MOUSE POSITION REPORTING (DEFAULT)        
+    rt68f_ikbd_writeb 0x08
+    
+    SET MOUSE THRESHOLD        
+    rt68f_ikbd_writeb 0x0b (COMMAND)
+    rt68f_ikbd_writeb 0x01 (x threshold in mouse ticks (positive integers))
+    rt68f_ikbd_writeb 0x01 (y threshold in mouse ticks (positive integers))
+
+    SET Y=0 AT TOP (mouse)
+    rt68f_ikbd_writeb 0x10
+
+    SET MOUSE BUTTON ACTION
+    rt68f_ikbd_writeb 0x07 (COMMAND)
+    rt68f_ikbd_writeb 0x00        
+    */
+
+    //TODO
 }
 
 #endif /* MACHINE_RT68F */
