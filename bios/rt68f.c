@@ -268,6 +268,9 @@ void rt68f_ikbd_writeb(UBYTE b)
 {
     KDEBUG(("rt68f_ikbd_writeb 0x%02x\n", b));
 
+    // TODO: Handle all commands
+    // Note: mouse and keyboard apparently work without this.
+    //       However some corner cases might not work properly.
 
     /* commands sent when EmuTOS start
     RESET
@@ -289,8 +292,6 @@ void rt68f_ikbd_writeb(UBYTE b)
     rt68f_ikbd_writeb 0x07 (COMMAND)
     rt68f_ikbd_writeb 0x00        
     */
-
-    //TODO
 }
 
 #endif /* MACHINE_RT68F */
