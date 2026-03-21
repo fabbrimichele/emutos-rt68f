@@ -184,8 +184,9 @@ void rt68f_kbd_init(void)
 
 void rt68f_kbd_int_c(void)
 {
-    UBYTE key = PS2A_DATA;
-    LED = key;
+    //UBYTE key = PS2A_DATA;
+    //LED = key;
+    LED = PS2A_DATA;
 }
 
 void rt68f_ikbd_writeb(UBYTE b)

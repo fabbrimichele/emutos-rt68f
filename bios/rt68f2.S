@@ -10,6 +10,7 @@
 
         // PS/2
         .equ ps2a_ctrl, 0x00470000
+        .equ ps2a_data, 0x00470002
         
 
 /******************************************************************************/
@@ -54,8 +55,10 @@ _rt68f_call_5ms:
 /******************************************************************************/
         .globl  _rt68f_kbd_int
 _rt68f_kbd_int:
-        or.w    #0x40,ps2a_ctrl         // Ackownledge interrupt
-        jsr    _rt68f_kbd_int_c        // Delegate to C implementation
+        movem.l d0-d1/a0-a1,-(sp)       // C code does not preserve these registers
+        or.w    #0x40,ps2a_ctrl         // Clear the hw interrupt
+        jbsr    _rt68f_kbd_int_c        // Delegate to C implementation
+        movem.l (sp)+,d0-d1/a0-a1
         rte
 
 /******************************************************************************/
@@ -63,10 +66,10 @@ _rt68f_kbd_int:
 /******************************************************************************/
         .globl  _rt68f_vbl
 _rt68f_vbl:
-        // Clear the hardware interrupt IMMEDIATELY
-        // This prevents the timer from re-triggering while we are in the handler
-        or.w    #0x0040,vga_ctrl        // Ackownledge interrupt
+        movem.l d0-d1/a0-a1,-(sp)       // C code does not preserve these registers
+        or.w    #0x0040,vga_ctrl        // Clear the hw interrupt
         jbsr    _int_vbl                // Call the standard VBL handler
+        movem.l (sp)+,d0-d1/a0-a1
         rte
 
 
