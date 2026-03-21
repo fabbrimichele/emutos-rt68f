@@ -15,6 +15,7 @@
 #include "vectors.h"
 #include "tosvars.h"
 #include "rt68f_ps2_idkb.h"
+#include "ikbd.h"
 
 
 #ifdef MACHINE_RT68F
@@ -65,6 +66,8 @@
 #define IDKB_BREAK              0x80
 #define IDKB_CAPSLOCK           0x3a
 
+static UBYTE ps2_mouse_buf[3];
+static UBYTE ps2_mouse_buf_index;
 
 /* Initialize Native Features
 *  do it as soon as possible so that kprintf can make use of them
@@ -189,6 +192,9 @@ void rt68f_kbd_mouse_init(void)
     // Enable mouse stream
     PS2B_DATA = 0xf4;
 
+    // Reset mouse buffer index
+    ps2_mouse_buf_index = 0;
+
     // Set interrupt handlers
     VEC_LEVEL5 = rt68f_kbd_int;
     VEC_LEVEL6 = rt68f_mouse_int;
@@ -215,9 +221,47 @@ void rt68f_kbd_int_c(void)
     */
 }
 
+static void rt68f_mouse_send_packet(SBYTE dx, SBYTE dy, BOOL btn_left, BOOL btn_right)
+{
+    SBYTE packet[3];
+    packet[0] = 0xf8; /* IKBD mouse packet header */
+
+    if (btn_right)
+        packet[0] |= 0x01;
+
+    if (btn_left)
+        packet[0] |= 0x02;
+
+    packet[1] = dx;
+    packet[2] = dy;
+
+    // Send mouse packet to IKBD handler
+    call_mousevec(packet);
+
+}
+
 void rt68f_mouse_int_c(void) {
-    UBYTE ps2_data = PS2B_DATA;
-    LED = ps2_data;
+    SBYTE mouse_packet = PS2B_DATA;
+
+    // Sync check: Byte 0 must have bit 3 set to 1
+    if (ps2_mouse_buf_index == 0 && !(mouse_packet & 0x08))
+        return; // Out of sync, ignore this byte
+
+    ps2_mouse_buf[ps2_mouse_buf_index++] = mouse_packet;
+
+    if (ps2_mouse_buf_index == 3) 
+    {
+        // Full packet received
+        BOOL left_button = ps2_mouse_buf[0] & 0x01;
+        BOOL right_button = ps2_mouse_buf[0] & 0x02;
+        SBYTE dx = ps2_mouse_buf[1];
+        SBYTE dy = -ps2_mouse_buf[2];
+
+        rt68f_mouse_send_packet(dx, dy, left_button, right_button);
+
+        // Reset index
+        ps2_mouse_buf_index = 0;
+    }
 }
 
 void rt68f_ikbd_writeb(UBYTE b)
