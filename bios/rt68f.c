@@ -272,7 +272,7 @@ void rt68f_kbd_int_c(void)
         return;
     } 
 
-    UBYTE idkb_code;
+    UBYTE idkb_code = 0;
     if (ps2_keyb_is_ext) 
     {
         idkb_code = ps2_to_idkb_ext_map[ps2_code];
@@ -286,8 +286,8 @@ void rt68f_kbd_int_c(void)
 
     if (idkb_code != 0) {
         if (ps2_keyb_is_break) {
-            ps2_keyb_is_break = FALSE;
             idkb_code |= IDKB_BREAK;
+            ps2_keyb_is_break = FALSE;
         }
 
         call_ikbdraw(idkb_code);
