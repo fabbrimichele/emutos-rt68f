@@ -591,6 +591,7 @@
 # ifndef CONF_WITH_BUS_ERROR
 #  define CONF_WITH_BUS_ERROR 0
 # endif
+/* CONF_SERIAL_CONSOLE 1 is required by KDEBUG */
 # ifndef CONF_SERIAL_CONSOLE
 #  define CONF_SERIAL_CONSOLE 1
 # endif
@@ -599,6 +600,9 @@
 # endif
 # ifndef CONF_STRAM_SIZE
 #  define CONF_STRAM_SIZE 256*1024
+# endif
+# ifndef CONF_WITH_SDMMC
+#  define CONF_WITH_SDMMC 1
 # endif
 /*
 # ifndef EMUTOS_LIVES_IN_RAM
