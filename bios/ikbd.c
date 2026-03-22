@@ -38,6 +38,7 @@
 #include "bios.h"
 #include "coldfire.h"
 #include "amiga.h"
+#include "rt68f.h"
 #include "lisa.h"
 
 
@@ -965,6 +966,8 @@ void ikbd_writeb(UBYTE b)
     coldfire_flexcan_ikbd_writeb(b);
 #elif defined(MACHINE_AMIGA)
     amiga_ikbd_writeb(b);
+#elif defined(MACHINE_RT68F)
+    rt68f_ikbd_writeb(b);    
 #endif
 }
 
@@ -1078,6 +1081,10 @@ void kbd_init(void)
 
 #ifdef MACHINE_AMIGA
     amiga_kbd_init();
+#endif
+
+#ifdef MACHINE_RT68F
+    rt68f_kbd_mouse_init();
 #endif
 
 #ifdef MACHINE_LISA

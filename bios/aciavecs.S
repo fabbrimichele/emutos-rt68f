@@ -226,7 +226,7 @@ _init_acia_vecs:
         jsr     _amiga_init_keyboard_interrupt
 #endif
 #ifdef MACHINE_RT68F
-        jsr     _rt68f_init_keyboard_interrupt
+        jsr     _rt68f_init_timer_interrupt
 #endif
         rts
 
@@ -556,7 +556,7 @@ _call_mousevec:
 #endif
         rts
 
-#if CONF_WITH_FLEXCAN || CONF_SERIAL_IKBD || defined(MACHINE_LISA)
+#if CONF_WITH_FLEXCAN || CONF_SERIAL_IKBD || defined(MACHINE_LISA) || defined(MACHINE_RT68F)
 
 /******************************************************************************/
 /* Call ikbdraw from C                                                        */
@@ -568,7 +568,7 @@ _call_ikbdraw:
         move.b  5(sp),d0                // raw IKBD byte
         jra     ikbdraw
 
-#endif /* CONF_WITH_FLEXCAN || CONF_SERIAL_IKBD || defined(MACHINE_LISA) */
+#endif /* CONF_WITH_FLEXCAN || CONF_SERIAL_IKBD || defined(MACHINE_LISA) || defined(MACHINE_RT68F) */
 
 #ifdef MACHINE_AMIGA
 

@@ -7,29 +7,35 @@
 
         // VGA
         .equ vga_ctrl,  0x00430000      // VGA Control
+
+        // PS/2
+        .equ ps2a_ctrl, 0x00470000
+        .equ ps2a_data, 0x00470002
+        .equ ps2b_ctrl, 0x00480000
+        .equ ps2b_data, 0x00480002
         
 
 /******************************************************************************/
-/* Interrupt 2: Keyboard and 200 Hz timer                                     */
+/* Interrupt 2: 200 Hz timer                                                  */
 /******************************************************************************/
 // Configure interrupt
-        .globl  _rt68f_init_keyboard_interrupt
-_rt68f_init_keyboard_interrupt:
-        move.l  #rt68f_int_timer,0x68   // 0x68 is autovector interrupt level 2
+        .globl  _rt68f_init_timer_interrupt
+_rt68f_init_timer_interrupt:
+        move.l  #rt68f_timer_int,0x68   // 0x68 is autovector interrupt level 2
         move.w  #79,tmra_prs            // Set prescaler timer A
         move.w  #999,tmra_cnt         // Set counter timer A -> 16MHz / (80 * 1000) = 200Hz
         or.w    #0x0002,tmra_ctrl       // Enable Timer A interrupt (bit 1 high)        
         rts
 
         // Interrupt handler
-rt68f_int_timer:
+rt68f_timer_int:
         // Clear the hardware interrupt IMMEDIATELY
         // This prevents the timer from re-triggering while we are in the handler
         or.w    #0x0040,tmra_ctrl       // Acknowledge interrupt
         move.w  #0x2700,sr              // Forbid higher level interrupts
                                         // Original interrupt mask will be restored by RTE
         movem.l d0-d1/a0-a1,-(sp)
-        jbsr    _rt68f_int_timer_c      // Delegate to C implementation
+        jbsr    _rt68f_timer_int_c      // Delegate to C implementation
                                         // If C call is removed the SP needs to be adjusted
         movem.l (sp)+,d0-d1/a0-a1
         rte           
@@ -47,14 +53,36 @@ _rt68f_call_5ms:
 
 
 /******************************************************************************/
-/* VBL interrupt handler                                                              */
+/* Interrupt 5: Keyboard                                                      */
 /******************************************************************************/
-        .globl  _rt68f_vbl
-_rt68f_vbl:
-        // Clear the hardware interrupt IMMEDIATELY
-        // This prevents the timer from re-triggering while we are in the handler
-        or.w    #0x0040,vga_ctrl        // Ackownledge interrupt
+        .globl  _rt68f_kbd_int
+_rt68f_kbd_int:
+        movem.l d0-d1/a0-a1,-(sp)       // C code does not preserve these registers
+        or.w    #0x40,ps2a_ctrl         // Clear the hw interrupt
+        jbsr    _rt68f_kbd_int_c        // Delegate to C implementation
+        movem.l (sp)+,d0-d1/a0-a1
+        rte
+
+/******************************************************************************/
+/* Interrupt 6: Mouse                                                         */
+/******************************************************************************/
+        .globl  _rt68f_mouse_int
+_rt68f_mouse_int:
+        movem.l d0-d1/a0-a1,-(sp)       // C code does not preserve these registers
+        or.w    #0x40,ps2b_ctrl         // Clear the hw interrupt
+        jbsr    _rt68f_mouse_int_c      // Delegate to C implementation
+        movem.l (sp)+,d0-d1/a0-a1
+        rte
+
+/******************************************************************************/
+/* Interrupt 5: VBL                                                           */
+/******************************************************************************/
+        .globl  _rt68f_vbl_int
+_rt68f_vbl_int:
+        movem.l d0-d1/a0-a1,-(sp)       // C code does not preserve these registers
+        or.w    #0x0040,vga_ctrl        // Clear the hw interrupt
         jbsr    _int_vbl                // Call the standard VBL handler
+        movem.l (sp)+,d0-d1/a0-a1
         rte
 
 
