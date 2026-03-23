@@ -28,7 +28,7 @@ It's extremesely slow, it might depend on:
 void spi_clock_ident(void)
 {
     KDEBUG(("rt68f: spi_clock_ident\n"));
-    // TODO
+    // TODO: this is HW dependent and should set the SD clock to 400 KHz
 }
 
 void spi_clock_mmc(void)
@@ -40,7 +40,8 @@ void spi_clock_mmc(void)
 void spi_clock_sd(void)
 {
     KDEBUG(("rt68f: spi_clock_sd\n"));
-    // TODO
+    // TODO: this is HW dependent and should switch the SD card clock 
+    //       from 400KHz to the maximum BUS speed or to 25 MHz not sure yet.
 }
 
 void spi_cs_assert(void)
