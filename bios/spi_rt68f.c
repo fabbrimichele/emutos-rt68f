@@ -5,6 +5,8 @@
 #include "emutos.h"
 #include "spi.h"
 
+// This alone doesn't work
+#define ENABLE_KDEBUG
 
 // Byte access -> odd addresses
 #define RT68F_SPI_DTLW *(volatile UBYTE*)(0x4c0001) // Data LSB
@@ -56,7 +58,7 @@ void spi_clock_mmc(void)
 void spi_clock_sd(void)
 {
     KDEBUG(("rt68f: spi_clock_sd\n"));
-    //RT68F_SPI_CONF = 0b01000; // 01 transfer = 8 bits, 101 clock divisor = clk/2 (16MHz/2=8MHz)
+    RT68F_SPI_CONF = 0b01000; // 01 transfer = 8 bits, 101 clock divisor = clk/2 (16MHz/2=8MHz)    
 }
 
 void spi_cs_assert(void)
@@ -64,15 +66,15 @@ void spi_cs_assert(void)
     // Write to Command Register
     // Clear the deselect bit (bit 1) to 0. 
     // This ensures that when we start, the CS stays low.
-    //RT68F_SPI_CDST |= 0b00001000; // CS asserted CDST[3]=1 
-    RT68F_SPI_CDST = 0b00001000;
+    //RT68F_SPI_CDST |= 0b00000010; // CS asserted CDST[1]=1 
+    RT68F_SPI_CDST = 0b00000010;
     spi_send_byte(0xff);  // dummy byte to force a write to the register (other drivers do this, not sure it is required)
 
 }
 
 void spi_cs_unassert(void)
 {   
-    //RT68F_SPI_CDST &= 0b11110111; // CS unasserted CDST[3]=0
+    //RT68F_SPI_CDST &= 0b11111101; // CS unasserted CDST[3]=0
     RT68F_SPI_CDST = 0b00000000;
     spi_send_byte(0xff);  // dummy byte to force a write to the register (other drivers do this, not sure it is required)
 }
@@ -81,7 +83,7 @@ void spi_initialise(void)
 {
     KDEBUG(("rt68f: spi_initialise\n"));
     RT68F_SPI_CONF = 0b00001101; // 01 transfer = 8 bits, 101 clock divisor = clk/64 (16MHz/64=250KHz)
-    RT68F_SPI_CDST = 0b00000000; // SPI address CDST[6:4]=0, CS CDST[3]=0, interrupt dis CDST[2]=0, CDST[1] ignore, stop CDST[0]=0
+    RT68F_SPI_CDST = 0b00000000; // SPI address CDST[6:4]=0, interrupt dis CDST[2]=0, CS CDST[1]=0, stop CDST[0]=0
 }
 
 UBYTE spi_recv_byte(void)
@@ -100,9 +102,9 @@ void spi_send_byte(UBYTE input)
 
     // 3. Start transfer: assert Start CDST[0] = 1
     //RT68F_SPI_CDST |= 0x01;
-    RT68F_SPI_CDST = 0b00001001;
+    RT68F_SPI_CDST = 0b00000011;
 
-    // 4. Wait for transfer to finish before returning
-    // TODO: is this required?
+    // 4. Wait for transfer to finish before returning 
+    // (required to finish reading commands)
     while(RT68F_SPI_CDST & 0x01);
 }
