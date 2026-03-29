@@ -642,16 +642,6 @@ TOCLEAN += *.img
 IMG_RT68F = emutos-rt68f.img
 RT68F_DEFS =
 LOAD_ADDRESS  := 00040000                 
-# TODO: this should be read from the img file
-START_ADDRESS := 00040000
-
-# TODO: 
-# 1. add to the rt68h bin header a start address along with load address
-# 2. change the bootloader to use it
-# 3. change the make file to set the starting address
-#    a. it can be taken from the original image (it's the bytes from 4 to 7)
-#    b. or it can be taken from the map file (it's _main)
-# I'd use (b) because it's how EmuTOS is expected to work (and it sounds easier)
 
 .PHONY: rt68f
 NODEP += rt68f
@@ -670,9 +660,9 @@ $(IMG_RT68F): emutos.img mkrom
 	SHELL_RAW_FILE="emutos.img"; \
 	FILE_SIZE=$$(stat -c %s $$SHELL_RAW_FILE); \
 	HEX_SIZE=$$(printf "%08X" "$$FILE_SIZE"); \
-	HEADER_HEX="$(LOAD_ADDRESS)$(START_ADDRESS)"$$HEX_SIZE; \
+	HEADER_HEX="$(LOAD_ADDRESS)"$$HEX_SIZE; \
 	echo "$$HEADER_HEX" | xxd -r -p | cat - $$SHELL_RAW_FILE > $(IMG_RT68F)
-# cp $< $(IMG_RT68F)
+
 
 #
 # Amiga Image
