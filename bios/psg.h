@@ -19,7 +19,11 @@ struct psg {
   UBYTE data;
 };
 
+#ifdef MACHINE_RT68F                                     
+#define PSG ((volatile struct psg *) 0x00490000)
+#else
 #define PSG ((volatile struct psg *) 0xffff8800)
+#endif
 
 /* bits in PSG_MULTI register */
 

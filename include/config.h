@@ -604,6 +604,9 @@
 # ifndef CONF_WITH_SDMMC
 #  define CONF_WITH_SDMMC 1
 # endif
+# ifndef CONF_WITH_YM2149                        
+#  define CONF_WITH_YM2149 1                            
+# endif
 /*
 # ifndef EMUTOS_LIVES_IN_RAM
 #  define EMUTOS_LIVES_IN_RAM 1
@@ -620,9 +623,11 @@
 #  define RT68F_DEBUG_PRINT
 # endif
 */
+/*
 # ifndef ENABLE_KDEBUG
 #  define ENABLE_KDEBUG
 # endif
+*/
 #endif
 
 /*
