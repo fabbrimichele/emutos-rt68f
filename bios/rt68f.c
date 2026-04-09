@@ -15,7 +15,7 @@
 #include "vectors.h"
 #include "tosvars.h"
 #include "ikbd.h"
-
+#include "serport.h"
 
 #ifdef MACHINE_RT68F
 
@@ -132,9 +132,26 @@ const UBYTE *rt68f_physbase(void)
 /* RS232                                                                      */
 /******************************************************************************/
 
-void rt68f_rs232_init(void) {
-    // Serial is already configured by the bootloader
+void rt68f_rs232_init(void) 
+{
+    // Settings inhereted from boot loader
+
+    VEC_LEVEL4 = rt68f_rs232_int; // Set interrupt handler
+    UART_IER = 0x01;              // Enable interrupt on receive holding register
+    // TODO: define an constant for  0x01
+
+    LED = 1;
 }
+
+void rt68f_rs232_int_c(void) 
+{
+    if (UART_IIR != 4) // Check received rata ready and clean interrupt
+        return;        // If not Received Data Ready, return
+
+    char in_b = UART_RBR;
+    push_serial_iorec(in_b); // Read and push serial input byte    
+}
+
 
 BOOL rt68f_rs232_can_write(void)
 {
