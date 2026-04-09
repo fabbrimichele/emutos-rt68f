@@ -52,6 +52,10 @@
 #define VBLANK_INT_ENABLE       (1 << 3) // Bit 3: 0x08
 #define VBLANK_ACK              (1 << 6) // Bit 6: 0x40
 
+/* Serial Feature Bit Flags */
+#define UART_IER_INT_RHR        0x01; // Enable interrupt on receive holding register
+#define UART_LSR_THE            0x20; // Transmission Holding Empty
+
 /* PS/2 Feature Bit Flags */
 #define PS2_INT_ENABLE          (1 << 1) // Bit 1: 0x02
 
@@ -134,13 +138,10 @@ const UBYTE *rt68f_physbase(void)
 
 void rt68f_rs232_init(void) 
 {
-    // Settings inhereted from boot loader
+    // Main settings inhereted from boot loader
 
     VEC_LEVEL4 = rt68f_rs232_int; // Set interrupt handler
-    UART_IER = 0x01;              // Enable interrupt on receive holding register
-    // TODO: define an constant for  0x01
-
-    LED = 1;
+    UART_IER = UART_IER_INT_RHR;  // Enable interrupt on receive holding register
 }
 
 void rt68f_rs232_int_c(void) 
@@ -148,23 +149,19 @@ void rt68f_rs232_int_c(void)
     if (UART_IIR != 4) // Check received rata ready and clean interrupt
         return;        // If not Received Data Ready, return
 
-    char in_b = UART_RBR;
-    push_serial_iorec(in_b); // Read and push serial input byte    
+    push_serial_iorec(UART_RBR); // Read and push serial input byte    
 }
 
 
 BOOL rt68f_rs232_can_write(void)
 {
     // Check if space is available in the FIFO
-    return UART_LSR & 0x20; // Bit 5 - TODO: use a constant
+    return UART_LSR & UART_LSR_THE; // Transmission Holding Empty
 }
 
 void rt68f_rs232_write_byte(UBYTE b)
 {
-    while (!rt68f_rs232_can_write())
-    {
-        // Wait
-    }
+    while (!rt68f_rs232_can_write()); // Wait
     
     // Send the byte
     UART_RBR = (UWORD)b;
