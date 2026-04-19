@@ -414,6 +414,10 @@ WORD check_moderez(WORD moderez)
     return amiga_check_moderez(moderez);
 #endif
 
+#ifdef MACHINE_RT68F
+    return rt68f_check_moderez(moderez);
+#endif
+
 #if CONF_WITH_VIDEL
     if (has_videl)
         return videl_check_moderez(moderez);
@@ -691,6 +695,11 @@ int rez_changeable(void)
 #ifdef MACHINE_AMIGA
     return TRUE;
 #endif
+
+#ifdef MACHINE_RT68F
+    return TRUE;
+#endif
+
 
 #if CONF_WITH_VIDEL
     if (has_videl)  /* can't change if real ST monochrome monitor */
@@ -1165,6 +1174,8 @@ WORD setscreen(UBYTE *logLoc, const UBYTE *physLoc, WORD rez, WORD videlmode)
 
 #ifdef MACHINE_AMIGA
     amiga_setrez(rez, videlmode);
+#elif defined(MACHINE_RT68F)
+    rt68f_setrez(rez, videlmode);
 #elif CONF_WITH_ATARI_VIDEO
     atari_setrez(rez, videlmode);
 #endif

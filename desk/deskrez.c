@@ -231,6 +231,20 @@ WORD mode, monitor;
 }
 #endif
 
+#ifdef MACHINE_RT68F
+/*
+ *  change_st_rez(): change desktop RT68F resolution
+ *  returns:    0   user cancelled change
+ *              1   user wants to change; newres is updated with new resolution.
+ */
+static int change_rt68f_rez(WORD *newres)
+{
+     // Switch beetween 640x480 and 640x400
+    *newres = rt68f_vgetmode() ? 0 : 1;
+    return 1;    
+}
+#endif
+
 #ifdef MACHINE_AMIGA
 /* This assumes that inside ADAMIREZ dialog, buttons are sorted
  * left to right then top to bottom. */
@@ -318,6 +332,10 @@ int change_resolution(WORD *newres,WORD *newmode)
 #ifdef MACHINE_AMIGA
     return change_amiga_rez(newres,newmode);
 #endif
+
+#ifdef MACHINE_RT68F 
+    return change_rt68f_rez(newres);
+#endif    
 
 #if CONF_WITH_VIDEL
     if (has_videl)

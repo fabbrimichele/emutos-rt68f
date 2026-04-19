@@ -16,6 +16,7 @@
 #include "tosvars.h"
 #include "ikbd.h"
 #include "serport.h"
+#include "biosext.h" // For rt68f_vgetmode
 
 #ifdef MACHINE_RT68F
 
@@ -42,10 +43,8 @@
 #define PS2B_DATA *(volatile UWORD*)(0x480002) // Data Register
 
 /* Screen Mode Bits 1-0) */
-#define MODE_640X400_4COL       0x00  // 0 -> 640x400 4 colors
-#define MODE_640X200_16COL      0x01  // 1 -> 640x200 16 colors
-#define MODE_320X200_256CO      0x02  // 2 -> 320x200 256 colors
-#define MODE_640X400_2COL       0x03  // 3 -> 640x400 2 colors
+#define MODE_640X400_2COL       0x00  // 0 -> 640x400 2 colors
+#define MODE_640X480_2COL       0x01  // 0 -> 640x400 2 colors
 
 /* Screen Feature Bit Flags */
 #define OVERSCAN_ON             (1 << 2) // Bit 2: 0x04
@@ -70,6 +69,7 @@ static UBYTE ps2_mouse_buf[3];
 static UBYTE ps2_mouse_buf_index;
 static BOOL  ps2_keyb_is_break;
 static BOOL  ps2_keyb_is_ext;
+static UBYTE current_screen_mode;
 
 
 /* Initialize Native Features
@@ -93,17 +93,20 @@ const UBYTE *rt68f_screenbase;
 void rt68f_screen_init(void)
 {
     // Set palette colors:
-    pword_vga_palette[0] = 0x0FFF; // color 0 xRGB (white)
-    pword_vga_palette[1] = 0x0000; // color 1 xRGB (black)
+    // B&D VGA Device does not support palette
+    //pword_vga_palette[0] = 0x0FFF; // color 0 xRGB (white)
+    //pword_vga_palette[1] = 0x0000; // color 1 xRGB (black)
 
     /* Set VBL interrupt routine */
     VEC_LEVEL3 = rt68f_vbl_int;
-    VGA_CTRL = MODE_640X400_2COL | VBLANK_INT_ENABLE;
+
+    /* Set screen mode and enable vblank interrupt */
+    rt68f_set_screen_mode(MODE_640X480_2COL);
 }
 
 ULONG rt68f_vram_size(void)
 {
-    return 64000UL;
+    return 49152UL;
 }
 
 /*
@@ -114,11 +117,30 @@ WORD rt68f_get_palette(void)
     return 2;
 }
 
+WORD  rt68f_vgetmode(void)
+{
+    return current_screen_mode;
+}
+
 void rt68f_get_current_mode_info(UWORD *planes, UWORD *hz_rez, UWORD *vt_rez)
 {
-    *planes = 1;
-    *hz_rez = 640;
-    *vt_rez = 400;
+    switch (current_screen_mode)
+    {
+        case MODE_640X400_2COL:
+            *planes = 1;
+            *hz_rez = 640;
+            *vt_rez = 400;
+            break;
+
+        case MODE_640X480_2COL:
+            *planes = 1;
+            *hz_rez = 640;
+            *vt_rez = 480;
+            break;
+
+        default:
+            break;
+    }    
 }
 
 void rt68f_setphys(const UBYTE *addr)
@@ -129,6 +151,41 @@ void rt68f_setphys(const UBYTE *addr)
 const UBYTE *rt68f_physbase(void)
 {
     return rt68f_screenbase;
+}
+
+// Set the screen mode, always enable VBLANK
+void rt68f_set_screen_mode(UBYTE screen_mode) 
+{
+    VGA_CTRL = screen_mode | VBLANK_INT_ENABLE;
+    current_screen_mode = screen_mode;
+}
+
+WORD rt68f_check_moderez(WORD moderez)
+{
+    return (moderez == current_screen_mode)?0:moderez;
+}
+
+/*
+    Used by setscreen function (screen.c).
+    It uses ST resolutions screen modes (low and med) but for 
+    640x400 and 640x480, this may confuse  some applications. 
+    A better approach could be the amiga one with VIDEL.
+*/
+void rt68f_setrez(WORD rez, WORD videlmode)
+{
+    switch (rez)
+    {
+        case 0:
+            rt68f_set_screen_mode(MODE_640X400_2COL);
+            break;
+
+        case 1:
+            rt68f_set_screen_mode(MODE_640X480_2COL);
+            break;
+
+        default:
+            break;
+    }
 }
 
 
@@ -188,7 +245,6 @@ void rt68f_init_system_timer(void)
 void rt68f_timer_int_c(void)
 {
     rt68f_call_5ms();
-    //LED = hz_200;
 }
 
 /******************************************************************************/

@@ -772,12 +772,13 @@ void gem_main(void)
         n = 0L;
     infbuf[n] = '\0';           /* terminate input data */
 
+
     if (!gl_changerez)          /* can't be here because of rez change,       */
         process_inf1();         /*  so see if .inf says we need to change rez */
 
-    if (gl_changerez) {
+    if (gl_changerez) {       
         switch(gl_changerez) {
-#if CONF_WITH_ATARI_VIDEO
+#if CONF_WITH_ATARI_VIDEO || defined(MACHINE_RT68F)
         case 1:                     /* ST(e) or TT display */
             Setscreen(-1L, -1L, gl_nextrez-2, 0);
             initialise_palette_registers(gl_nextrez-2, 0);
